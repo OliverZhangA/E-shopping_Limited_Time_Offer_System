@@ -4,7 +4,7 @@ spring:
     #close cache
     cache: false
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://vcm-24561.vm.duke.edu:3306/seckill?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: Aohua@123**$
@@ -17,6 +17,20 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
       connection-test-query: SELECT 1
+
+  redis:
+    host: vcm-24561.vm.duke.edu
+    port: 6379
+    database: 0
+    connect-timeout: 10000ms
+    #连接池
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: 10000ms
+        max-idle: 200
+        min-idle: 5
+
 
   mybatis-plus:
     mapper-locations: classpath*:/mapper/*Mapper.xml
