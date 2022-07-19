@@ -2,7 +2,9 @@ package com.xxxx.seckill.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xxxx.seckill.exception.GlobalException;
+import com.xxxx.seckill.mapper.GoodsMapper;
 import com.xxxx.seckill.mapper.UserMapper;
+import com.xxxx.seckill.pojo.Goods;
 import com.xxxx.seckill.pojo.User;
 import com.xxxx.seckill.service.IUserService;
 import com.xxxx.seckill.utils.CookieUtil;
@@ -48,7 +50,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //        }
 
         //get user according to mobile number
+        System.out.println("------------");
+        System.out.println("+++++++++++++");
+        User user0 = userMapper.selectById("18012345678");
+        System.out.println(user0.getNickname());
+        System.out.println("+++++++++++++");
         User user = userMapper.selectById(mobile);
+        System.out.println("============");
+        System.out.println(user.getNickname());
         if(user == null){
             //return RespBean.error(RespBeanEnum.LOGIN_ERROR);
             throw new GlobalException(RespBeanEnum.LOGIN_ERROR);
@@ -63,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         redisTemplate.opsForValue().set("user:"+ticket, user);
         //request.getSession().setAttribute(ticket, user);
         CookieUtil.setCookie(request, response , "userTicket", ticket);
-        return RespBean.success();
+        return RespBean.success(ticket);
     }
 
 
@@ -75,4 +84,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         return user;
     }
+
+    @Override
+    public RespBean updatePassword(String userTicket, String password, HttpServletRequest request, HttpServletResponse response) {
+        User user = getUserByCookie(userTicket, request, response);
+        if(user==null){
+            throw new GlobalException(RespBeanEnum.MOBILE_NOT_EXIST);
+        }
+        user.setPassword(MD5Util.inputPassToDBPass(password, user.getSalt()));
+        int result = userMapper.updateById(user);
+        if(result == 1) {
+            redisTemplate.delete("user:" + userTicket);
+            return RespBean.success();
+        }
+        return RespBean.error(RespBeanEnum.PASSWORD_UPDATE_FAIL);
+    }
+
+
 }
