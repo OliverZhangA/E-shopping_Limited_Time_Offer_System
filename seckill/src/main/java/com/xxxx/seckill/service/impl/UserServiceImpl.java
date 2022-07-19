@@ -50,14 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //        }
 
         //get user according to mobile number
-        System.out.println("------------");
-        System.out.println("+++++++++++++");
-        User user0 = userMapper.selectById("18012345678");
-        System.out.println(user0.getNickname());
-        System.out.println("+++++++++++++");
         User user = userMapper.selectById(mobile);
-        System.out.println("============");
-        System.out.println(user.getNickname());
         if(user == null){
             //return RespBean.error(RespBeanEnum.LOGIN_ERROR);
             throw new GlobalException(RespBeanEnum.LOGIN_ERROR);
