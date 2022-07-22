@@ -21,6 +21,14 @@ public enum RespBeanEnum  {
     //secKill module 5005xx
     EMPTY_STOCK(500500, "out of stock"),
     REPEATE_ERROR(500501, "one can only order one of this product!"),
+
+    REQUEST_ILLEGAL(500502, "illegal request, please try again!"),
+
+    ERROR_CAPTCHA(500503, "wrong validation code, please try again!"),
+
+    ACCESS_LIMIT_REACHED(500504, "too frequent access request, please try again later!"),
+    //order module 5003xx
+    ORDER_NOT_EXIST(500300, "order does not exist!"),
     ;
 
 

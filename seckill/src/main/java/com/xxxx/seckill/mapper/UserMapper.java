@@ -7,9 +7,6 @@ import com.xxxx.seckill.pojo.User;
  * <p>
  *  Mapper 接口
  * </p>
- *
- * @author zhoubin
- * @since 2022-07-14
  */
 public interface UserMapper extends BaseMapper<User> {
 

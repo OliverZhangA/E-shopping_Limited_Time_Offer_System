@@ -8,8 +8,6 @@ import com.xxxx.seckill.pojo.SeckillOrder;
  *  服务类
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-16
  */
 public interface ISeckillOrderService extends IService<SeckillOrder> {
 

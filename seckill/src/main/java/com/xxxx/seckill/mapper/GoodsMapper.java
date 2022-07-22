@@ -11,8 +11,6 @@ import java.util.List;
  *  Mapper 接口
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-16
  */
 public interface GoodsMapper extends BaseMapper<Goods> {
 

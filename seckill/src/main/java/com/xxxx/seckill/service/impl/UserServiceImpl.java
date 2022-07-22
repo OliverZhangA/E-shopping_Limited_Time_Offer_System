@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServletResponse;
  *  服务实现类
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-14
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *  前端控制器
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-16
  */
 @Controller
 @RequestMapping("/seckillGoods")

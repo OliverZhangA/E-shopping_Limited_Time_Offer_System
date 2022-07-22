@@ -10,9 +10,6 @@ import java.net.URLEncoder;
 /**
  * Cookie工具类
  *
- * @author: LC
- * @date 2022/3/2 5:48 下午
- * @ClassName: CookieUtil
  */
 public final class CookieUtil {
 

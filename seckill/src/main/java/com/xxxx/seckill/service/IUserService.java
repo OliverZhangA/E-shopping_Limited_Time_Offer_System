@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
  *  服务类
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-14
  */
 public interface IUserService extends IService<User> {
 

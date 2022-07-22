@@ -8,8 +8,6 @@ import com.xxxx.seckill.pojo.SeckillGoods;
  *  服务类
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-16
  */
 public interface ISeckillGoodsService extends IService<SeckillGoods> {
 

@@ -19,8 +19,6 @@ import java.util.List;
 /**
  * 生成用户工具类
  *
- * @author zhoubin
- * @since 1.0.0
  */
 public class UserUtil {
     private static void createUser(int count) throws Exception {

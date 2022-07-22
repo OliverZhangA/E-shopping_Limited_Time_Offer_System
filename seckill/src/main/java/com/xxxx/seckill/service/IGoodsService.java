@@ -11,8 +11,6 @@ import java.util.List;
  *  服务类
  * </p>
  *
- * @author zhoubin
- * @since 2022-07-16
  */
 public interface IGoodsService extends IService<Goods> {
 
