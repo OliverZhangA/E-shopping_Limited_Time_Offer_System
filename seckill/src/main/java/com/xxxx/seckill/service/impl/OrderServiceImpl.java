@@ -18,6 +18,7 @@ import com.xxxx.seckill.vo.OrderDetailVo;
 import com.xxxx.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Transactional
     @Override
     public Order secKill(User user, GoodsVo goods) {
+        ValueOperations valueOperations = redisTemplate.opsForValue();
         SeckillGoods seckillGoods = seckillGoodsService.getOne(new QueryWrapper<SeckillGoods>().eq("goods_id", goods.getId()));
         seckillGoods.setStockCount(seckillGoods.getStockCount() - 1);
 //        boolean seckillGoodsResult = seckillGoodsService.update(new UpdateWrapper<SeckillGoods>().set("stock_count",
@@ -51,7 +53,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         boolean update = seckillGoodsService.update(new UpdateWrapper<SeckillGoods>().setSql("stock_count" +
                 " = stock_count - 1").eq("goods_id",
                 goods.getId()).gt("stock_count", 0));
-        if(!update) {
+        if(seckillGoods.getStockCount()<1) {
+            valueOperations.set("isStockEmpty:"+goods.getId(), "0");
             return null;
         }
 
