@@ -1,6 +1,8 @@
 package com.xxxx.seckill.controller;
 
 
+import com.wf.captcha.ArithmeticCaptcha;
+import com.xxxx.seckill.exception.GlobalException;
 import com.xxxx.seckill.pojo.SeckillMessage;
 import com.xxxx.seckill.pojo.SeckillOrder;
 import com.xxxx.seckill.pojo.User;
@@ -12,6 +14,8 @@ import com.xxxx.seckill.utils.JsonUtil;
 import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.el.parser.ArithmeticNode;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,17 +24,22 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("/seckill")
+@Slf4j
 public class SecKillController implements InitializingBean {
     @Autowired
     IGoodsService goodsService;
@@ -75,14 +84,19 @@ public class SecKillController implements InitializingBean {
 //        return "orderDetail";
 //    }
 
-    @RequestMapping(value = "/doSeckill", method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/doSeckill", method = RequestMethod.POST)
     @ResponseBody
-    public RespBean doSecKill(Model model, User user, Long goodsId){
+    public RespBean doSecKill(@PathVariable String path, User user, Long goodsId){
         if(user==null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
 
         ValueOperations valueOperations = redisTemplate.opsForValue();
+        Boolean check = orderService.checkPath(user, goodsId, path);
+        if(!check) {
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+
         //check if repeat seckill
         SeckillOrder secKillOrder = (SeckillOrder) redisTemplate.opsForValue().get("order:" + user.getId() + ":" + goodsId);
         if(secKillOrder!=null) {
@@ -134,6 +148,42 @@ public class SecKillController implements InitializingBean {
         }
         Long orderId = seckillOrderService.getResult(user, goodsId);
         return RespBean.success(orderId);
+    }
+
+    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @ResponseBody
+    public RespBean getPath(User user, Long goodsId, String captcha) {
+        if(user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        Boolean check = orderService.checkCaptcha(user, goodsId, captcha);
+        if(!check) {
+            return RespBean.error(RespBeanEnum.ERROR_CAPTCHA);
+        }
+        String str = orderService.createPath(user, goodsId);
+        return RespBean.success(str);
+    }
+
+    @RequestMapping(value = "/captcha", method = RequestMethod.GET)
+    @ResponseBody
+    public void verifyCode(User user, Long goodsId, HttpServletResponse response) {
+        if(user==null || goodsId < 0) {
+            throw new GlobalException(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+        response.setContentType("image/jpg");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 32, 3);
+        redisTemplate.opsForValue().set("captcha:" + user.getId() + ":" + goodsId, captcha.text(), 300, TimeUnit.SECONDS);
+        try {
+            captcha.out(response.getOutputStream());
+        } catch (IOException e) {
+            log.error("fail to generate the captcha!");
+        }
+
+
     }
 
 

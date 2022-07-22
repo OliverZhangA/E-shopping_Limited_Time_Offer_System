@@ -51,9 +51,15 @@ id="countDown"
 <!--                            id="buyButton">立即秒杀</button>-->
 <!--                    <input type="hidden" name="goodsId" id="goodsId"/>-->
 <!--                </form>-->
-                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="doSeckill()">立即秒杀
-                    <input type="hidden" name="goodsId" id="goodsId"/>
-                </button>
+                <div class="row">
+                    <div class="form-inline">
+                        <img id="captchaImg" width="130" height="32" onclick="refreshCaptcha()" style="display: none"/>
+                        <input id="captcha" class="form-control" style="display: none">
+                        <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="getSeckillPath()">立即秒杀
+                            <input type="hidden" name="goodsId" id="goodsId"/>
+                        </button>
+                    </div>
+                </div>
             </td>
         </tr>
         <tr>
@@ -72,9 +78,9 @@ id="countDown"
 </div>
 </body>
 <script>
-    function doSeckill() {
+    function doSeckill(path) {
         $.ajax({
-            url: "/seckill/doSeckill",
+            url: "/seckill/" + path + "doSeckill",
             type: "POST",
             data: {
                 goodsId: $("#goodsId").val(),
@@ -122,7 +128,7 @@ id="countDown"
                         })
                     }
                 }
-            }
+            },
             error:function (){
                 layer.msg("client request went wrong!")
             }

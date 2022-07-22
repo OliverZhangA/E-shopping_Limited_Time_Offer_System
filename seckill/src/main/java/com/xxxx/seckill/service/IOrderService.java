@@ -17,4 +17,10 @@ public interface IOrderService extends IService<Order> {
     Order secKill(User user, GoodsVo goods);
 
     OrderDetailVo detail(Long orderId);
+
+    String createPath(User user, Long goodsId);
+
+    Boolean checkPath(User user, Long goodsId, String path);
+
+    Boolean checkCaptcha(User user, Long goodsId, String captcha);
 }
