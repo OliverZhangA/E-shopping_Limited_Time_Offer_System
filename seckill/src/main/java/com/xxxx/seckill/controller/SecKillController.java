@@ -2,6 +2,7 @@ package com.xxxx.seckill.controller;
 
 
 import com.wf.captcha.ArithmeticCaptcha;
+import com.xxxx.seckill.config.AccessLimit;
 import com.xxxx.seckill.exception.GlobalException;
 import com.xxxx.seckill.pojo.SeckillMessage;
 import com.xxxx.seckill.pojo.SeckillOrder;
@@ -15,20 +16,19 @@ import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.el.parser.ArithmeticNode;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
@@ -150,12 +150,25 @@ public class SecKillController implements InitializingBean {
         return RespBean.success(orderId);
     }
 
+    @AccessLimit(seconds = 5, maxCount = 5, needLogin = true)
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
-    public RespBean getPath(User user, Long goodsId, String captcha) {
+    public RespBean getPath(User user, Long goodsId, String captcha, HttpServletRequest request) {
         if(user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
+//        ValueOperations valueOperations = redisTemplate.opsForValue();
+//        String uri = request.getRequestURI();
+//        captcha = "0";
+//        Integer count = (Integer) valueOperations.get(uri + ":" + user.getId());
+//        if(count == null) {
+//            valueOperations.set(uri+":"+user.getId(), 1, 5, TimeUnit.SECONDS);
+//        } else if(count < 5) {
+//            valueOperations.increment(uri + ":" + user.getId());
+//        } else {
+//            return RespBean.error(RespBeanEnum.ACCESS_LIMIT_REACHED);
+//        }
+
         Boolean check = orderService.checkCaptcha(user, goodsId, captcha);
         if(!check) {
             return RespBean.error(RespBeanEnum.ERROR_CAPTCHA);
